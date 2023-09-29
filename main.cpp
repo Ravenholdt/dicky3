@@ -54,8 +54,6 @@ void tick()
         } else {
             quotient[res] = (supply[res] + stockpile[res])/demand[res];
         }
-        if (quotient[res] > 1) { quotient[res] = 1; }
-        if (quotient[res] < 0) { quotient[res] = 0; }
         printf("%f, ", quotient[res]);
     }
     printf("\n");
@@ -63,11 +61,19 @@ void tick()
     // Calculate factory efficiency.
     for (int fac = 0; fac < (int)Factories::size; fac++ )
     {
+        factories[fac].efficiency = 1;
         for (int res = 0; res < (int)Resources::size ; res++)
         {
             if (factories[fac].input[res])
             {
-                factories[fac].efficiency *= quotient[res];
+                if (quotient[res] < factories[fac].efficiency)
+                {
+                    float eff = quotient[res];
+                    if (quotient[res] > 1) { eff = 1; }
+                    if (quotient[res] < 0) { eff = 0; }
+
+                    factories[fac].efficiency = eff;
+                }
             }
         }
     }
